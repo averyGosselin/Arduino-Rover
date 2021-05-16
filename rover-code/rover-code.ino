@@ -1,8 +1,8 @@
-#include <Servo.h>
 /*
  * Author: Avery Gosselin
  * Last Updated: 5/15/2021
 */
+#include <Servo.h>
 
 //Servo
 Servo servo;
