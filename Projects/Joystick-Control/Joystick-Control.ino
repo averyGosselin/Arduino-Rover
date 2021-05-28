@@ -1,55 +1,36 @@
-/*
- * Author: Avery Gosselin
- * Last Updated: 5/15/2021
-*/
+
 #include <Servo.h>
 
 //Servo
 Servo servo;
 int curPos = 90;
 
-//Photoresistor
-const int photores = A0;
-
 //Joystick
 int VRx = A1;
 int VRy = A2;
-int SW = 2;
 int xPosition = 0;
 int yPosition = 0;
-int SW_state = 0;
 int mapX = 0;
 int mapY = 0;
 
-//Buttons
-int forwardBtn = A3;
-int backwardBtn = A4;
-
-void setup() 
-{ 
+void setup()
+{
   //Initialize motor 
   pinMode(13, OUTPUT);
   pinMode(11, OUTPUT);
   pinMode(9, OUTPUT);
   digitalWrite(13, HIGH);
 
-  //Initialize photoresistor
-  pinMode(photores, INPUT);
-
-  //Initialize the buttons
-  pinMode(forwardBtn, INPUT);
-  pinMode(backwardBtn, INPUT);
-  
   //Initialize servo
   servo.attach(3);
   servo.write(90);
-  Serial.begin(9600);
-  
+
   //Initialize joystick
   pinMode(VRx, INPUT);
   pinMode(VRy, INPUT);
-  pinMode(SW, INPUT_PULLUP); 
-} 
+  
+  Serial.begin(9600);
+}
 
 //Turns the rover to a specified servo angle at a reasonable speed.
 void turn(int target)
@@ -66,31 +47,6 @@ void turn(int target)
     delay(10);
     servo.write(curPos);
   }
-}
-
-//Makes the rover run away erratically from bright lights, they're scary!
-void flee(){
-
-  int lightVal = analogRead(photores);
-  
-  while(lightVal >= 850){
-    long randTurn = random(50, 130);
-    long randDir = random(1,3);
-    
-    if(randDir < 2.0){
-      forward();
-    }
-    else{
-      backward();
-    }
-    turn((int)randTurn);
-    Serial.println(randTurn);
-    lightVal = analogRead(photores);
-    Serial.println(lightVal);
-    delay(250);
-  }
-  halt();
-  
 }
 
 //Drive the rover backwards (may vary depending on how you wired the motor)
@@ -115,31 +71,29 @@ void halt()
   digitalWrite(13, LOW);
 }
 
-//Put your code here, the functions above are just a starting point, connect them, change them, do whatever you want and
-//  have fun playing with your rover!
-//Current use: drive the tover around with the joystick and buttons.
-void loop() 
-{ 
+
+void loop()
+{
 
   xPosition = analogRead(VRx);
   yPosition = analogRead(VRy);
-  SW_state = digitalRead(SW);
   mapX = map(xPosition, 0, 1023, -512, 512);
   mapY = map(yPosition, 0, 1023, -512, 512);
 
-  if(forwardBtn == HIGH and backwardBtn == HIGH){
-    halt();
-  }
-  else if(forwardBtn == HIGH){
+  //If joystick pressed forward/backward move in desired direction
+  if (mapX < -50){
     forward();
   }
-  else if(analogRead(backwardBtn == HIGH)){
+  else if(mapX > 50){
     backward();
   }
-  else{
+  else {
     halt();
   }
+
+  //If joystick turned left/right turn wheels to a set left/right angle
   
+  //TODO: make the turning more dynamic so pushing farther in a direction makes it turn harder
   if(mapY > 25){
     turn(60);
   }
@@ -149,5 +103,4 @@ void loop()
   else{
     turn(90);
   }
-  delay(100);
-} 
+}
