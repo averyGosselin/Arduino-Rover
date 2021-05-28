@@ -1,0 +1,3 @@
+This project uses a joystick to control the movement of the rover.
+
+Unfortunately, tinkercad does not yet have a joystick module (and I️ dont feel like making one because it will not really be all that helpful), so I️ will not include the brd circuitry file here. Hopefully the code is straightforward enough to get you started on wiring.
