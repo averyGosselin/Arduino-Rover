@@ -1,6 +1,6 @@
 /*
  * Author: Avery Gosselin
- * Last Updated: 5/28/2021
+ * Last Updated: 6/6/2021
 */
 #include <Servo.h>
 
@@ -8,13 +8,9 @@
 Servo servo;
 int curPos = 90;
 
-#define echoPin 4 // attach pin D4 Arduino to pin Echo of HC-SR04
-#define trigPin 5 //attach pin D5 Arduino to pin Trig of HC-SR04
-
-// defines variables
-long duration; // variable for the duration of sound wave travel
-int distance; // variable for the distance measurement
-
+//Ultrasonic sensor
+#define echoPin 4
+#define trigPin 5
 
 void setup() 
 { 
@@ -30,31 +26,35 @@ void setup()
   servo.write(90);
   Serial.begin(9600);
 
-
-  pinMode(trigPin, OUTPUT); // Sets the trigPin as an OUTPUT
-  pinMode(echoPin, INPUT); // Sets the echoPin as an INPUT
-  Serial.begin(9600); // // Serial Communication is starting with 9600 of baudrate speed
-  Serial.println("Ultrasonic Sensor HC-SR04 Test"); // print some text in Serial Monitor
-  Serial.println("with Arduino UNO R3");
+  //Initialize ultrasonic sensor
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 } 
 
 int checkDist(){
+  long duration; // variable for the duration of sound wave travel
+  int distance; // variable for the distance measurement
+
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
+  
   // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
+  
   // Reads the echoPin, returns the sound wave travel time in microseconds
   duration = pulseIn(echoPin, HIGH);
+  
   // Calculating the distance
   distance = duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
-  // Displays the distance on the Serial Monitor
+  
+  // Returns calculated distance
   return distance;
 }
 
 void changeDir(){
-  long randTime = random(500, 2000);
+  long randTime = random(1500, 2500);
   long randTurn = random(1,3);
   if(randTurn < 2.0){
     turn(50);
@@ -65,13 +65,8 @@ void changeDir(){
   backward();
   delay(randTime);
 
-  randTurn = random(50, 130);
-  randTime = random(500, 2000);
-  forward();
-  turn((int)randTurn);
-  delay(randTime);
-
   turn(90);
+  forward();
 }
 
 //Turns the rover to a specified servo angle at a reasonable speed.
