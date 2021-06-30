@@ -1,0 +1,3 @@
+Control the rover with conductive sensers each of your fingers that, when connected to ground, ellicit a response from the rover. 
+
+I have not put together a wiring diagram for this one yet, I will get to it at some point but it is pretty straight forward given the code.
