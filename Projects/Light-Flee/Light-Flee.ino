@@ -1,14 +1,14 @@
 /*
  * Author: Avery Gosselin
- * Last Updated: 5/28/2021
+ * Last Updated: 9/27/2021
 */
 #include <Servo.h>
 
-//Servo
+//Set up Servo
 Servo servo;
 int curPos = 90;
 
-//Photoresistor
+//save photoresistor pin
 const int photores = A0;
 
 void setup() 
@@ -25,23 +25,52 @@ void setup()
   //Initialize servo
   servo.attach(3);
   servo.write(90);
-  Serial.begin(9600);
+  
+  //Uncomment for debugging with serial monitor
+  //Serial.begin(9600);
 } 
 
-//Turns the rover to a specified servo angle at a reasonable speed.
-void turn(int target)
+/*
+* Turns the front wheels to a target angle at a slow (1), medium (2), or high (3) speed
+* target: the angle the servo should be set to to turn the wheels 
+* speed: the speed at which the servo will be set to target, allowed speeds:
+*   slow = 1
+*   medium = 2
+*   fast = 3
+*/
+void turn(int target, int speed = 2)
 {
   int toAdd = 0;
+  
+  //Find out if the servo angle needs to increase or decrease
   if(target > curPos){
     toAdd = 1;
   }
   else{
     toAdd = -1;
   }
-  while(curPos != target){
-    curPos += toAdd;
-    delay(10);
-    servo.write(curPos);
+
+  //Turns the servo at the designated speed, defaults to medium if not specified or a valid number
+  if(speed == 1){
+    while(curPos != target){
+      curPos += toAdd;
+      delay(20);
+      servo.write(curPos);
+    }
+  }
+  else if(speed == 3){
+    while(curPos != target){
+      curPos += toAdd;
+      delay(5);
+      servo.write(curPos);
+    }
+  }
+  else {
+    while(curPos != target){
+      curPos += toAdd;
+      delay(5);
+      servo.write(curPos);
+    }
   }
 }
 
@@ -71,8 +100,10 @@ void halt()
 //Rover will run away from the brightness, it's nocturnal after all.
 void loop() 
 { 
+  //Gets the current reading of the photoresistor
   int lightVal = analogRead(photores);
   
+  //Will drive the rover forward/backward and turn randomly until it is out of the bright light
   while(lightVal >= 850){
     long randTurn = random(50, 130);
     long randDir = random(1,3);
@@ -84,9 +115,7 @@ void loop()
       backward();
     }
     turn((int)randTurn);
-    Serial.println(randTurn);
     lightVal = analogRead(photores);
-    Serial.println(lightVal);
     delay(250);
   }
   halt();

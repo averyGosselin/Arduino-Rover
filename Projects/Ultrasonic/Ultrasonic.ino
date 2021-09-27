@@ -1,6 +1,6 @@
 /*
  * Author: Avery Gosselin
- * Last Updated: 6/6/2021
+ * Last Updated: 9/27/2021
 */
 #include <Servo.h>
 
@@ -32,8 +32,10 @@ void setup()
 } 
 
 int checkDist(){
-  long duration; // variable for the duration of sound wave travel
-  int distance; // variable for the distance measurement
+  // variable for the duration of sound wave travel
+  long duration;
+  //variable for the distance measurement
+  int distance;
 
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
@@ -53,6 +55,7 @@ int checkDist(){
   return distance;
 }
 
+// Changes the direction of the rover for a random amount of time to attempt to escape a barrier
 void changeDir(){
   long randTime = random(1500, 2500);
   long randTurn = random(1,3);
@@ -69,20 +72,47 @@ void changeDir(){
   forward();
 }
 
-//Turns the rover to a specified servo angle at a reasonable speed.
-void turn(int target)
+/*
+* Turns the front wheels to a target angle at a slow (1), medium (2), or high (3) speed
+* target: the angle the servo should be set to to turn the wheels 
+* speed: the speed at which the servo will be set to target, allowed speeds:
+*   slow = 1
+*   medium = 2
+*   fast = 3
+*/
+void turn(int target, int speed = 2)
 {
   int toAdd = 0;
+  
+  //Find out if the servo angle needs to increase or decrease
   if(target > curPos){
     toAdd = 1;
   }
   else{
     toAdd = -1;
   }
-  while(curPos != target){
-    curPos += toAdd;
-    delay(10);
-    servo.write(curPos);
+
+  //Turns the servo at the designated speed, defaults to medium if not specified or a valid number
+  if(speed == 1){
+    while(curPos != target){
+      curPos += toAdd;
+      delay(20);
+      servo.write(curPos);
+    }
+  }
+  else if(speed == 3){
+    while(curPos != target){
+      curPos += toAdd;
+      delay(5);
+      servo.write(curPos);
+    }
+  }
+  else {
+    while(curPos != target){
+      curPos += toAdd;
+      delay(5);
+      servo.write(curPos);
+    }
   }
 }
 
@@ -108,7 +138,8 @@ void halt()
   digitalWrite(13, LOW);
 }
 
-
+// Main loop, will check if the rover is close to hitting something and activate changeDir to escape
+// Averages the recorded distance over three checks to avoid false assumptions of walls
 void loop() {
   int distance = 0;
   for(int i = 0; i < 3; i++){
